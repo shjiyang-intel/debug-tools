@@ -75,7 +75,6 @@ def main():
         metrix_compare(npu_output, ref_output)
 
         if args.mat:
-            import matplotlib
             import matplotlib.pyplot as plt
 
             fig, axs = plt.subplots(3)
@@ -93,7 +92,7 @@ def main():
             if not os.path.exists(output_folder):
                 os.makedirs(output_folder)
             
-            save_array_to_file(ref_output, folder=output_folder, model_name=get_model_name(args.model), tensor_name=name, device='CPU')
+            save_array_to_file(ref_output, folder=output_folder, model_name=get_model_name(args.model), tensor_name=name, device=args.device.upper())
             save_array_to_file(npu_output, folder=output_folder, model_name=get_model_name(args.model), tensor_name=name, device='NPU')
 
 if __name__ == '__main__':

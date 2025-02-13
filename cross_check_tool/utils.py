@@ -40,11 +40,11 @@ def build_argparser():
     args = parser.add_argument_group('Options')
     
     args.add_argument("-m", "--model", help="Required. Path to a .xml file.", required=True, type=str, default=None)
-    args.add_argument("-b", "--blob", help="Optional. Path to a .blob file. Would be compiled from --model file if doesn't set.", required=False, type=str, default=None)
+    args.add_argument("-b", "--blob", help="Optional. Path to a .blob file. Would be compiled from --model file if neither the blob nor the NPU output bin file is set.", required=False, type=str, default=None)
     args.add_argument("-d", "--device", help="Optional. Device for reference, default is CPU", required=False, type=str)
     
     args.add_argument("-i", "--inputs", help="Required. Path to inputs file.", nargs='+', required=False, type=str, default=None)
-    args.add_argument("-no", "--npu_outputs", help="Required. Path to npu's outputs file.", nargs='+', required=False, type=str, default=None)
+    args.add_argument("-no", "--npu_outputs", help="Optional. Path to npu's outputs file.", nargs='+', required=False, type=str, default=None)
 
     args.add_argument("-ip", "--input_precision", help="precision of input tensor", nargs='+', default="f32", type=str, required=False)
     args.add_argument("-op", "--output_precision", help="precision of output tensor", nargs='+', default="f32", type=str, required=False)
