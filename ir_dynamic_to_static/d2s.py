@@ -18,7 +18,7 @@ def build_argparser():
     
     args.add_argument("-m", "--model", help="Required. Path to a .xml file.", required=True, type=str)
     args.add_argument("-o", "--output", help="Required. Path to output folder, static IR will be renamed to \{model_name\}_static.xml", required=True, type=str)
-    args.add_argument("--inputs", help="Required. Path to a .xml file.", required=True, type=str)
+    args.add_argument("--inputs", help="Required. Provide dynamic inputs and corresponding shape e.g. --inputs \"a[1,2,3],b[3,4,5]\".", required=True, type=str)
 
     parsed_args = parser.parse_args()
     return parsed_args
