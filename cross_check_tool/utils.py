@@ -41,7 +41,7 @@ def build_argparser():
     
     args.add_argument("-m", "--model", help="Required. Path to a .xml file.", required=True, type=str, default=None)
     args.add_argument("-b", "--blob", help="Optional. Path to a .blob file. Would be compiled from --model file if neither the blob nor the NPU output bin file is set.", required=False, type=str, default=None)
-    args.add_argument("-d", "--device", help="Optional. Device for reference, default is CPU", required=False, type=str)
+    args.add_argument("-d", "--device", help="Optional. Device for reference, default is CPU", required=False, type=str, default='CPU')
     
     args.add_argument("-i", "--inputs", help="Required. Path to inputs file.", nargs='+', required=False, type=str, default=None)
     args.add_argument("-no", "--npu_outputs", help="Optional. Path to npu's outputs file.", nargs='+', required=False, type=str, default=None)
