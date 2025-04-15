@@ -25,14 +25,20 @@ def main():
     if args.npu_outputs and args.blob:
         log.warning("Both npu_outputs and blob are set, please only set one of them, otherwise the NPU model Blob will be ignored")
 
-    npu_combined = ConcreteModel(core, model_path=args.model, blob_path=args.blob, deviceName='NPU')
-
     model_ops, model_inputs, model_outputs = ref_combined.getModelInfo()
 
     input_datas = input_processing(model_inputs, args.inputs, args.input_precision)
     ref_res = infer(ref_combined, input_datas)
 
-    if args.npu_outputs:
+    if args.imd_dir:
+        log.info("============ Processing IMD output.bin ===================")
+        npu_res = dict()
+        for idx, output in enumerate(model_outputs):
+            # FIXME: only support float32 now
+            file_path = os.path.join(args.imd_dir, f'output-{idx}.bin')
+            npu_res[output.any_name] = np.fromfile(file_path, dtype=np.float32).reshape(output.tensor.shape)
+            log.info(f"::: Reading output \"{output.any_name}\" with shape {output.tensor.shape} from file {file_path}")
+    elif args.npu_outputs:
         log.info("============ Processing NPU output.bin ===================")
         output_names = []
         fake_num = 0
@@ -56,6 +62,7 @@ def main():
             log.info(f"::: Reading output \"{npu_output_name}\" from file {tensor} with dtype {precision}")
             npu_res[npu_output_name] = np.fromfile(tensor, precision).reshape(shape)
     else:
+        npu_combined = ConcreteModel(core, model_path=args.model, blob_path=args.blob, deviceName='NPU')
         npu_res = infer(npu_combined, input_datas)
 
     fake_num = 0

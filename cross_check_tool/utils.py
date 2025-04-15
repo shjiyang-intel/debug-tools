@@ -54,6 +54,7 @@ def build_argparser():
     args.add_argument('--print', help='Enables ref and npu output show up', action='store_true', default=False)
     args.add_argument('--mat', help='Enables ref and npu output comparision diagram show up', action='store_true', default=False)
     args.add_argument("-out_dir", "--output_dir", help="Output Saved folder", nargs='+', type=str, required=False)
+    args.add_argument("-imd_dir", "--imd_dir", help="IMD dir, if provide IMD dir, cross_check will load NPU output bin files from it. This arg priority is higher than --npu_outputs", type=str, required=False)
     
     args.add_argument('-h', '--help', action='help', default=SUPPRESS, help='Show this help message and exit.')
 
@@ -169,38 +170,21 @@ def read_binary_file(bin_file, model_input, precision):
 
 
 @error_handling("input processing")
-def input_processing(model_inputs, input_path, precision_list):
+def input_processing(model_inputs, input_path, precision_list) -> dict:
     log.info("====================== Processing Inputs ======================")
-    inputs = [input for input in input_path]
+    input_paths = [Path(input) for input in input_path]
     input_names = [input.any_name for input in model_inputs]
     log.info(f'input_names: {input_names}')
     input_data = {}
 
-    if len(inputs) != len(model_inputs):
-        raise Exception('Please provided the matched input')
+    if len(input_paths) != len(model_inputs):
+        raise Exception('Please provide the matched input')
     
     precisions = process_input_precision(input_names, precision_list)
 
-    for i in range(min(len(inputs), len(model_inputs))):
-        tensor_name = os.path.splitext(os.path.basename(inputs[i]))[0]
-        # splited = inputs[i].rsplit(':', maxsplit=1)
-        # print(inputs)
-        # if len(splited) == 0:
-        #     raise Exception(f"Can't parse {'input_file'} input parameter!")
-        # tensor_name = None
-        # if len(splited) == 1:
-        #     tensor_name = input_names[i]
-        # else:
-        #     tensor_name = splited.pop(0)
-        if tensor_name not in input_names:
-            raise Exception(f"Input with name {tensor_name} doesn't exist in the model!")
+    for i in range(len(input_paths)):
+        log.info(f"::: Reading input \"{input_names[i]}\" from {input_paths[i]}")
+        input_data[input_names[i]] = read_binary_file(input_paths[i], model_inputs[i], precisions[input_names[i]])
 
-        path = Path(inputs[i])
-        if path.exists() and path.is_file():
-            log.info(f"::: Reading input \"{tensor_name}\" from {str(path)}")
-            current_input = model_inputs[input_names.index(tensor_name)]
-            input_data[tensor_name] = read_binary_file(path, current_input, precisions[tensor_name])
-            # print(input_data[tensor_name])
-            # input_data[tensor_name] = read_binary_file(path, current_input, np.float32)
     return input_data
 
